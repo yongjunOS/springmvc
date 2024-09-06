@@ -8,7 +8,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>yongjunos</title>
     <link rel="stylesheet" href="<c:url value='/css/menu.css'/>">
     <style>
         * { box-sizing:border-box; }
@@ -64,7 +64,7 @@
 <body>
 <div id="menu">
     <ul>
-        <li id="logo">fastcampus</li>
+        <li id="logo">yongjunos</li>
         <li><a href="<c:url value='/'/>">Home</a></li>
         <li><a href="<c:url value='/board/list'/>">Board</a></li>
         <li><a href="<c:url value='${loginOutLink}'/>">${loginOut}</a></li>
