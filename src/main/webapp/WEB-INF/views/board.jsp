@@ -320,6 +320,29 @@
             $("textarea[name=comment]").focus().val("@" + $(this).siblings(".commenter").text() + " ");
         });
 
+
+        $("#commentList").on("click", ".modBtn", function () {
+            let cno = $(this).closest(".comment-item").data("cno");
+            let comment = prompt("수정할 내용을 입력하세요.");
+
+            console.log("Sending PATCH request:", {cno: cno, comment: comment});
+
+            $.ajax({
+                type: 'PATCH',
+                url: '/ch4/comments/' + cno,
+                headers: {"content-type": "application/json"},
+                data: JSON.stringify({cno: cno, comment: comment}),
+                success: function (result) {
+                    console.log("PATCH request successful:", result);
+                    showList(bno);
+                },
+                error: function (xhr, status, error) {
+                    console.error("PATCH request failed:", status, error);
+                    alert("댓글 수정에 실패했습니다.");
+                }
+            });
+        });
+
         let toHtml = function (comments) {
             let tmp = "";
 

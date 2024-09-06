@@ -2,19 +2,22 @@ package com.fastcampus.ch4.service;
 
 import com.fastcampus.ch4.dao.*;
 import com.fastcampus.ch4.domain.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Service
 public class CommentServiceImpl implements CommentService {
-    //    @Autowired
-    BoardDao boardDao;
-    //    @Autowired
-    CommentDao commentDao;
+    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
 
-    //    @Autowired
+    private final BoardDao boardDao;
+    private final CommentDao commentDao;
+
+    @Autowired
     public CommentServiceImpl(CommentDao commentDao, BoardDao boardDao) {
         this.commentDao = commentDao;
         this.boardDao = boardDao;
@@ -26,14 +29,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-
     @Transactional(rollbackFor = Exception.class)
     public int remove(Integer cno, Integer bno, String commenter) throws Exception {
         int rowCnt = boardDao.updateCommentCnt(bno, -1);
-        System.out.println("updateCommentCnt - rowCnt = " + rowCnt);
-//        throw new Exception("test");
+        logger.debug("updateCommentCnt - rowCnt = {}", rowCnt);
+
         rowCnt = commentDao.delete(cno, commenter);
-        System.out.println("rowCnt = " + rowCnt);
+        logger.debug("delete - rowCnt = {}", rowCnt);
+
         return rowCnt;
     }
 
@@ -41,13 +44,11 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(rollbackFor = Exception.class)
     public int write(CommentDto commentDto) throws Exception {
         boardDao.updateCommentCnt(commentDto.getBno(), 1);
-//                throw new Exception("test");
         return commentDao.insert(commentDto);
     }
 
     @Override
     public List<CommentDto> getList(Integer bno) throws Exception {
-//        throw new Exception("test");
         return commentDao.selectAll(bno);
     }
 
@@ -57,6 +58,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int modify(CommentDto commentDto) throws Exception {
         return commentDao.update(commentDto);
     }
