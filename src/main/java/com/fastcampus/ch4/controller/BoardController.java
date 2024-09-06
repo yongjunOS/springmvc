@@ -4,6 +4,8 @@ import com.fastcampus.ch4.domain.BoardDto;
 import com.fastcampus.ch4.domain.PageHandler;
 import com.fastcampus.ch4.domain.SearchCondition;
 import com.fastcampus.ch4.service.BoardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,8 @@ import java.util.List;
 @RequestMapping("/board")
 public class BoardController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
+
     @Autowired
     BoardService boardService;
 
@@ -31,6 +35,8 @@ public class BoardController {
         String writer = (String)session.getAttribute("id");
         boardDto.setWriter(writer);
 
+        logger.info("Modifying board: {}", boardDto);
+
         try {
             if (boardService.modify(boardDto)!= 1)
                 throw new Exception("Modify failed.");
@@ -38,7 +44,7 @@ public class BoardController {
             rattr.addFlashAttribute("msg", "MOD_OK");
             return "redirect:/board/list"+sc.getQueryString();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error modifying board", e);
             m.addAttribute(boardDto);
             m.addAttribute("msg", "MOD_ERR");
             return "board";
@@ -47,8 +53,8 @@ public class BoardController {
 
     @GetMapping("/write")
     public String write(Model m) {
+        logger.info("Accessed write page");
         m.addAttribute("mode", "new");
-
         return "board";
     }
 
@@ -57,6 +63,8 @@ public class BoardController {
         String writer = (String)session.getAttribute("id");
         boardDto.setWriter(writer);
 
+        logger.info("Writing new board: {}", boardDto);
+
         try {
             if (boardService.write(boardDto) != 1)
                 throw new Exception("Write failed.");
@@ -64,13 +72,14 @@ public class BoardController {
             rattr.addFlashAttribute("msg", "WRT_OK");
             return "redirect:/board/list";
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error writing new board", e);
             m.addAttribute(boardDto);
             m.addAttribute("mode", "new");
             m.addAttribute("msg", "WRT_ERR");
             return "board";
         }
     }
+
 
     @GetMapping("/read")
     public String read(Integer bno, SearchCondition sc, RedirectAttributes rattr, Model m) {
