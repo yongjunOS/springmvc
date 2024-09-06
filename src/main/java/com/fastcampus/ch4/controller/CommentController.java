@@ -25,9 +25,9 @@ public class CommentController {
 //    }
     // 댓글을 수정하는 메서드
     @PatchMapping("/comments/{cno}")   // /ch4/comments/26  PATCH
-    public ResponseEntity<String> modify(@PathVariable Integer cno, @RequestBody CommentDto dto) {
-//        String commenter = (String)session.getAttribute("id");
-        String commenter = "asdf";
+    public ResponseEntity<String> modify(@PathVariable Integer cno, @RequestBody CommentDto dto, HttpSession session) {
+        String commenter = (String)session.getAttribute("id");
+//        String commenter = "asdf";
         dto.setCommenter(commenter);
         dto.setCno(cno);
         System.out.println("dto = " + dto);
@@ -50,8 +50,10 @@ public class CommentController {
     // 댓글을 등록하는 메서드
     @PostMapping("/comments")   // /ch4/comments?bno=1085  POST
     public ResponseEntity<String> write(@RequestBody CommentDto dto, Integer bno, HttpSession session) {
-//        String commenter = (String)session.getAttribute("id");
-        String commenter = "asdf";
+        String commenter = (String) session.getAttribute("id");
+//        String commenter = "asdf";
+
+
         dto.setCommenter(commenter);
         dto.setBno(bno);
         System.out.println("dto = " + dto);
@@ -70,8 +72,8 @@ public class CommentController {
     // 지정된 댓글을 삭제하는 메서드
     @DeleteMapping("/comments/{cno}")  // DELETE /comments/1?bno=1085  <-- 삭제할 댓글 번호
     public ResponseEntity<String> remove(@PathVariable Integer cno, Integer bno, HttpSession session) {
-//        String commenter = (String)session.getAttribute("id");
-        String commenter = "asdf";
+        String commenter = (String) session.getAttribute("id");
+//        String commenter = "asdf";
 
         try {
             int rowCnt = service.remove(cno, bno, commenter);
