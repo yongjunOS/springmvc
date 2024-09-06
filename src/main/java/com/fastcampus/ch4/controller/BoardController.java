@@ -80,14 +80,15 @@ public class BoardController {
         }
     }
 
-
     @GetMapping("/read")
     public String read(Integer bno, SearchCondition sc, RedirectAttributes rattr, Model m) {
+        logger.info("Reading board with bno: {}", bno);
         try {
             BoardDto boardDto = boardService.read(bno);
             m.addAttribute(boardDto);
+            logger.info("Board read successfully: {}", boardDto);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error reading board with bno: " + bno, e);
             rattr.addFlashAttribute("msg", "READ_ERR");
             return "redirect:/board/list"+sc.getQueryString();
         }
@@ -100,22 +101,26 @@ public class BoardController {
         String writer = (String)session.getAttribute("id");
         String msg = "DEL_OK";
 
+        logger.info("Removing board with bno: {}, writer: {}", bno, writer);
+
         try {
             if(boardService.remove(bno, writer)!=1)
                 throw new Exception("Delete failed.");
+            logger.info("Board removed successfully");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error removing board with bno: " + bno, e);
             msg = "DEL_ERR";
         }
 
         rattr.addFlashAttribute("msg", msg);
         return "redirect:/board/list"+sc.getQueryString();
     }
-
     @GetMapping("/list")
     public String list(Model m, SearchCondition sc, HttpServletRequest request) {
-        if(!loginCheck(request))
-            return "redirect:/login/login?toURL="+request.getRequestURL();  // 로그인을 안했으면 로그인 화면으로 이동
+        if(!loginCheck(request)) {
+            logger.info("User not logged in. Redirecting to login page.");
+            return "redirect:/login/login?toURL="+request.getRequestURL();
+        }
 
         try {
             int totalCnt = boardService.getSearchResultCnt(sc);
@@ -129,13 +134,15 @@ public class BoardController {
 
             Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
             m.addAttribute("startOfToday", startOfToday.toEpochMilli());
+
+            logger.info("Board list retrieved successfully. Total count: {}", totalCnt);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error retrieving board list", e);
             m.addAttribute("msg", "LIST_ERR");
             m.addAttribute("totalCnt", 0);
         }
 
-        return "boardList"; // 로그인을 한 상태이면, 게시판 화면으로 이동
+        return "boardList";
     }
 
     private boolean loginCheck(HttpServletRequest request) {
